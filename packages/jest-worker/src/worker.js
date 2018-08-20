@@ -87,6 +87,13 @@ export default class {
   }
 
   _initialize() {
+    const forceColor =
+      'FORCE_COLOR' in process.env
+        ? process.env['FORCE_COLOR']
+        : // $FlowFixMe: Does not know about isTTY
+          process.stdout.isTTY
+          ? '1'
+          : '0';
     const child = childProcess.fork(
       require.resolve('./child'),
       // $FlowFixMe: Flow does not work well with Object.assign.
@@ -94,6 +101,7 @@ export default class {
         {
           cwd: process.cwd(),
           env: Object.assign({}, process.env, {
+            FORCE_COLOR: forceColor,
             JEST_WORKER_ID: this._options.workerId,
           }),
           // Suppress --debug / --inspect flags while preserving others (like --harmony).
